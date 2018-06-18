@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Here Is ToDoList</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" media="screen" href="css/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <link href="css/Font-Awesome-3.2.1/css/font-awesome.css" rel="stylesheet">
+    <script src="js/jquery-3.3.1.min.js"></script>
+    <script src="js/popper.js"></script>
+    <script src="js/dateformat.js"></script>
+    <script src="js/bootstrap.js"></script>
+    <style>
+        ul,
+        li {
+            margin: 0px;
+            padding: 0px;
+        }
+        
+        li {
+            list-style: none
+        }
+    </style>
+</head>
+
+<body style="background:url(images/1.gif)">
+    <div id="app" class="container col-sm-12 col-md-12">
+        <div class="row">
+            <div class="sidebar col-sm-2 col-md-2" :class="{sidebarOther:States[1].state}">
+                <div class="sidebar-header" :class="{sidebarHeaderOther:States[1].state}">
+                    <div style="background:url(images/TX.png);width:24px;height: 24px;float: left;"></div>
+                    <div>
+                        <span class=" dropdown-toggle" data-toggle="dropdown"><%= name %>
+                                <span class="caret"></span>
+                        </span>
+                        <ul class="dropdown-menu" role="menu" style="width: 25px;">
+                            <li>
+                                <div class="MenuOption" @click="changeTheme()">{{States[1].name}}</div>
+                            </li>
+                            <li>
+                                <hr>
+                            </li>
+                            <li>
+                                <div class="MenuOption">
+                                    <a href="/logout">注销</a>
+                                </div>
+                            </li>
+                        </ul>
+                        <!-- 搜索按钮 -->
+                        <span class="icon-search" @click="changeSearchState()"></span>
+                    </div>
+                </div>
+                <div class="sidebar-content">
+                    <ul class="lists">
+                        <div class="todayToolbar" :class="{todayToolbarOther:States[1].state}">
+                            <div class="todayToolbar-icon">
+                                <span class="icon-certificate"></span>
+                            </div>
+                            <div class="todayToolbar-title">
+                                <span class="listItem-title " @click="getTable(-2)"><span>{{ tables[0].title }}</span></span>
+                                <span class="listItem-count ">--{{tables[0].toDothings.thingsNotFinishNum}}</span>
+                            </div>
+                            <div class="todayToolbar-count"></div>
+                        </div>
+                        <div>
+                            <div class="simpleDropAreaConnectorTarget " :class="{todayToolbarOther:States[1].state}">
+                                <div class="todayToolbar-icon">
+                                    <span class="icon-truck"></span>
+                                </div>
+                                <div class="listItem-inner ">
+                                    <span class="listItem-title " @click="getTable(-1)">{{ tables[1].title }}</span>
+                                    <span class="listItem-count ">--{{tables[1].toDothings.thingsNotFinishNum}}</span>
+                                </div>
+                            </div>
+                            <div class="sidebar-lastStaticlist ">
+                                <hr/>
+                            </div>
+                            <div v-for="(table,index) in Mytables" class="simpleDropAreaConnectorTarget " :class="{simpleDropAreaConnectorTargetOther:States[1].state}">
+
+
+                                <div class="todayToolbar-icon">
+                                    <span class="icon-reorder">
+                                </span>
+                                </div>
+                                <div class="listItem-inner ">
+                                    <span class="listItem-title " @click="getTable(index)">{{ table.title }}</span>
+                                    <span class="listItem-count ">--{{table.toDothings.thingsNotFinishNum}}</span>
+                                    <span class="icon-remove" @click="deleteTable(index)"></span>
+                                </div>
+
+
+                            </div>
+                        </div>
+                    </ul>
+                    <div class="sidebar-addList ">
+                        <div class="todayToolbar-icon">
+                            <span class="icon-plus"></span>
+                        </div>
+                        <button class="addList " @click="createNewTable()">
+                        <div class=" addList-inner ">
+                            <div class="addList-label "><span>新建清单</span></div>
+                        </div>
+                    </button>
+                    </div>
+                </div>
+                <div class="sidebar-footer "></div>
+            </div>
+            <div class="main col-sm-10 col-md-10" :class="{mainOther:States[1].state}">
+                <div class="tasksToolbar " :class="{tasksToolbarOther:States[1].state}">
+                    <div class="tasksToolbar-headline ">
+                        <!-- 选定指定清单 -->
+                        <div class="tasksToolbar-titleContainer ">
+                            <div class="listTitle " v-for="(table,index) in tables " v-if="index===curTableId+2 ">
+                                <input class="addTask-input " v-model="tables[curTableId+2].title " :class="{searchDiv:States[3].state}">
+                                <input class="addTask-input" v-model="searchInfo" :class="{searchDiv:!States[3].state}" placeholder="在此搜索" @keyup.enter="searchThings()">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex-container ">
+                    <div class="flexBoxFix ">
+                        <div class="main-background ">
+                            <div class="tasks col-sm-12" :class="{tasksOther:States[1].state}">
+                                <!-- 指定清单中的未完成待办事项 -->
+                                <span class="icon-ok-circle"><span><font size="5px">未完成</font></span></span>
+                                <span class="icon-plus" @click="changeInputState()" :class="{searchDiv:States[3].state}"></span>
+                                <div :class="{searchDiv:States[3].state}">
+                                    <div class="taskItem-body " v-for="(table,tableIndex) in tables" v-if="tableIndex===curTableId+2">
+                                        <div v-for="(thing,thingsIndex) in table.toDothings.thingsNotFinish">
+                                            <div class="thingsForm">
+                                                <!-- 未完成事项 -->
+                                                <div class="taskItem-title ">
+                                                    <input class="addTask-input" v-model="table.toDothings.thingsNotFinish[thingsIndex].title">
+                                                </div>
+                                                <div class="thingsFormOption btn-group">
+                                                    <!-- 标记已完成 -->
+                                                    <span class="icon-ok-sign" @click="changeFinishState(thingsIndex,-1)"></span>&nbsp;
+                                                    <!-- 操作 -->
+                                                    <span class="icon-wrench dropdown-toggle" data-toggle="dropdown" style="height: 15px;">
+                                                        <span class="caret"></span>
+                                                    </span>
+                                                    <ul class="dropdown-menu" role="menu" style="width: 25px;">
+                                                        <li>
+                                                            <div class="MenuOption">
+                                                                <a class="icon-sort-up" href="#" @click="pgUP(thingsIndex,-1)"></a>
+                                                            </div>
+                                                        </li>
+                                                        <li>
+                                                            <div class="MenuOption">
+                                                                <a href="#">编辑</a>
+                                                            </div>
+                                                        </li>
+                                                        <li>
+                                                            <div class="MenuOption">
+                                                                <a class="icon-sort-down" href="#" @click="pgDN(thingsIndex,-1)"></a>
+                                                            </div>
+                                                        </li>
+                                                        <li>
+                                                            <hr>
+                                                        </li>
+                                                        <li>
+                                                            <div class="MenuOption">
+                                                                <a href="#" @click="deleteThings(thingsIndex,-1)">删除</a>
+                                                            </div>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- 搜索结果未完成显示区域 -->
+                                <div :class="{searchDiv:!States[3].state}" v-if="searchInfo!=''">
+                                    <div class="taskItem-body" v-for="things in searchResoultNotFinish">
+                                        <div class="taskItem-search">
+                                            {{tables[things.TbIndex].title}}->->{{tables[things.TbIndex].toDothings.thingsNotFinish[things.ThIndex].title}}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 清单中已完成 -->
+                        <span class="icon-ok"><font size="5px">已完成</font></span>
+                        <button class="btn" @click="changeDisplay()" :class="{searchDiv:States[3].state}">{{this.States[0].msg}}已完成</button>
+                        <div class="tasks" :class="{searchDiv:States[3].state}">
+                            <div class="taskItem-body " v-for="(table,tableIndex) in tables" v-if="tableIndex===curTableId+2" :class="{FhThingsDisplay:States[0].state}">
+                                <div v-for="(thing,thingsIndex) in table.toDothings.thingsIsFinish">
+                                    <div class="thingsForm">
+                                        <div class="taskItem-title ">
+                                            <input class="addTask-input" v-model="table.toDothings.thingsIsFinish[thingsIndex].title">
+                                        </div>
+                                        <div class="thingsFormOption btn-group">
+                                            <!-- 标记未完成 -->
+                                            <span class=" icon-ok-circle" @click="changeFinishState(thingsIndex,1)"></span> &nbsp;
+                                            <!-- 操作 -->
+                                            <span class="icon-wrench dropdown-toggle" data-toggle="dropdown">
+                                                <span class="caret"></span>
+                                            </span>
+                                            <ul class="dropdown-menu" role="menu">
+                                                <li>
+                                                    <div class="MenuOption">
+                                                        <a class="icon-sort-up" href="#" @click="pgUP(thingsIndex,1)"></a>
+                                                    </div>
+                                                </li>
+                                                <li>
+                                                    <div class="MenuOption">
+                                                        <a href="#">编辑</a>
+                                                    </div>
+                                                </li>
+                                                <li>
+                                                    <div class="MenuOption">
+                                                        <a class="icon-sort-down" href="#" @click="pgDN(thingsIndex,1)"></a>
+                                                    </div>
+                                                </li>
+                                                <li>
+                                                    <hr>
+                                                </li>
+                                                <li>
+                                                    <div class="MenuOption">
+                                                        <a href="#" @click="deleteThings(thingsIndex,1)">删除</a>
+                                                    </div>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 搜索结果已完成显示区域 -->
+                        <div :class="{searchDiv:!States[3].state}" v-if="searchInfo!=''">
+                            <div class="taskItem-body" v-for="things in searchResoultIsFinish">
+                                <div class="taskItem-search">
+                                    {{tables[things.TbIndex].title}}->->{{tables[things.TbIndex].toDothings.thingsIsFinish[things.ThIndex].title}}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 添加事项 -->
+                    <div :class="{addThingsInput:States[2].state}">
+                        <input type="date" class="addTask-input" name="plan_date_time" v-model="table.toDothings.thingsNotFinish[0].FTime" style="width: 15%">
+                        <input type="text " id="addTaskInput " class="addTask-input " v-model="table.toDothings.thingsNotFinish[0].title" placeholder="添加待办事项" @keyup.enter="addToDoThings()">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <script src="js/vue.js "></script>
+    <script>
+        var curDate = DateFormat.format(new Date(), 'yyyy-MM-dd');
+        var vm = new Vue({
+            el: '#app',
+            //数据
+            data: {
+                curTableId: '-2',
+                tableNum: '2',
+                searchInfo: '',
+                curDate: curDate,
+
+                table: {
+                    id: 0,
+                    title: '新建清单',
+                    toDothings: {
+                        id: '',
+                        thingsNotFinish: [{
+                            title: '',
+                            FTime: curDate
+                        }],
+                        thingsIsFinish: [{
+                            title: '',
+                            FTime: curDate
+                        }],
+                        thingsNotFinishNum: 0,
+                        thingsIsFinishNum: 0,
+                    }
+                },
+                States: [{
+                    name: 'FhThingsDisplay', //[0] 隐藏/显示未完成状态
+                    state: false,
+                    msg: '隐藏'
+                }, {
+                    name: '暖', //[1] 主题切换状态
+                    state: false,
+                }, {
+                    name: 'inputState', //[2]  添加事项input框隐藏/显示
+                    state: true
+                }, {
+                    name: 'searchState', //[3]  搜索div隐藏显示
+                    state: false
+                }],
+                tables: [{
+                    id: -2,
+                    title: '我的一天',
+                    toDothings: {
+                        id: 0,
+                        thingsNotFinish: [],
+                        thingsIsFinish: [],
+                        thingsNotFinishNum: 0,
+                        thingsIsFinishNum: 0,
+                    }
+                }, {
+                    id: -1,
+                    title: 'toDo',
+                    toDothings: {
+                        id: 0,
+                        thingsNotFinish: [],
+                        thingsIsFinish: [],
+                        thingsNotFinishNum: 0,
+                        thingsIsFinishNum: 0,
+                    }
+                }],
+            },
+
+            //方法
+            methods: {
+                //新建清单
+                createNewTable: function() {
+                    this.table.id = this.tableNum - 1;
+                    this.table.title = this.table.title + this.table.id;
+                    this.tableNum++;
+                    this.tables.push(this.table);
+                    this.tables[this.tables.length - 1].toDothings.thingsNotFinish.splice(0, 1);
+                    this.tables[this.tables.length - 1].toDothings.thingsIsFinish.splice(0, 1);
+
+
+                    this.table = {
+                        id: '',
+                        title: '新建清单',
+                        toDothings: {
+                            id: '',
+                            thingsNotFinish: [{
+                                title: '',
+                                FTime: curDate
+                            }],
+                            thingsIsFinish: [{
+                                title: '',
+                                FTime: curDate
+                            }],
+                            thingsNotFinishNum: 0,
+                            thingsIsFinishNum: 0,
+                        }
+                    }
+                },
+                // 获取当前聚焦清单
+                getTable: function(index) {
+                    this.curTableId = index;
+                },
+                //添加待办事项 
+                addToDoThings: function() {
+                    this.tables[this.curTableId + 2].toDothings.thingsNotFinish.push(this.table.toDothings.thingsNotFinish[0]);
+                    this.tables[this.curTableId + 2].toDothings.id += 1;
+                    this.tables[this.curTableId + 2].toDothings.thingsNotFinishNum += 1;
+                    this.table.toDothings.thingsNotFinish = [{
+                        title: '',
+                        FTime: this.curDate
+                    }];
+                },
+                //改变事件完成状态
+                changeFinishState: function(thingsIndex, thingsState) {
+                    if (thingsState === -1) {
+                        this.tables[this.curTableId + 2].toDothings.thingsIsFinish.push(this.tables[this.curTableId + 2].toDothings.thingsNotFinish[thingsIndex]);
+                        this.tables[this.curTableId + 2].toDothings.thingsNotFinish.splice(thingsIndex, 1);
+                        this.tables[this.curTableId + 2].toDothings.thingsNotFinishNum -= 1;
+                        this.tables[this.curTableId + 2].toDothings.thingsIsFinishNum += 1;
+                    }
+                    if (thingsState === 1) {
+                        this.tables[this.curTableId + 2].toDothings.thingsNotFinish.push(this.tables[this.curTableId + 2].toDothings.thingsIsFinish[thingsIndex]);
+                        this.tables[this.curTableId + 2].toDothings.thingsIsFinish.splice(thingsIndex, 1);
+                        this.tables[this.curTableId + 2].toDothings.thingsIsFinishNum -= 1;
+                        this.tables[this.curTableId + 2].toDothings.thingsNotFinishNum += 1;
+                    }
+                },
+                //显示/隐藏 已完成
+                changeDisplay: function() {
+                    if (this.States[0].state === true) {
+                        this.States[0].state = false;
+                        this.States[0].msg = '隐藏';
+                    } else {
+                        this.States[0].state = true;
+                        this.States[0].msg = '显示';
+                    }
+                },
+                //更改主题样式
+                changeTheme: function() {
+                    if (this.States[1].state === true) {
+                        this.States[1].state = false;
+                        this.States[1].name = '暖';
+                    } else {
+                        this.States[1].state = true;
+                        this.States[1].name = '冷';
+                    }
+                },
+                //删除事项
+                deleteThings: function(thingsIndex, thingsState) {
+                    if (thingsState === -1) {
+                        this.tables[this.curTableId + 2].toDothings.thingsNotFinish.splice(thingsIndex, 1);
+                        this.tables[this.curTableId + 2].toDothings.thingsNotFinishNum -= 1;
+                    }
+                    if (thingsState === 1) {
+                        this.tables[this.curTableId + 2].toDothings.thingsIsFinish.splice(thingsIndex, 1);
+                        this.tables[this.curTableId + 2].toDothings.thingsIsFinishNum -= 1;
+                    }
+
+                },
+                //事项手动排序
+                pgUP: function(thingsIndex, thingsState) {
+                    if (thingsState === -1) {
+                        if (thingsIndex === 0) {
+                            let length = this.tables[this.curTableId + 2].toDothings.thingsNotFinish.length;
+                            this.table.toDothings.thingsNotFinish.splice(0, 1, this.tables[this.curTableId + 2].toDothings.thingsNotFinish[thingsIndex]);
+                            this.tables[this.curTableId + 2].toDothings.thingsNotFinish.splice(thingsIndex, 1, this.tables[this.curTableId + 2].toDothings.thingsNotFinish[length - 1]);
+                            this.tables[this.curTableId + 2].toDothings.thingsNotFinish.splice(length - 1, 1, this.table.toDothings.thingsNotFinish[0]);
+                            this.table.toDothings.thingsNotFinish[0] = [];
+                        } else {
+                            this.table.toDothings.thingsNotFinish.splice(0, 1, this.tables[this.curTableId + 2].toDothings.thingsNotFinish[thingsIndex]);
+                            this.tables[this.curTableId + 2].toDothings.thingsNotFinish.splice(thingsIndex, 1, this.tables[this.curTableId + 2].toDothings.thingsNotFinish[thingsIndex - 1]);
+                            this.tables[this.curTableId + 2].toDothings.thingsNotFinish.splice(thingsIndex - 1, 1, this.table.toDothings.thingsNotFinish[0]);
+                            this.table.toDothings.thingsNotFinish[0] = [];
+                        }
+                    }
+                    if (thingsState === 1) {
+                        if (thingsIndex === 0) {
+                            let length = this.tables[this.curTableId + 2].toDothings.thingsIsFinish.length;
+                            this.table.toDothings.thingsNotFinish.splice(0, 1, this.tables[this.curTableId + 2].toDothings.thingsIsFinish[thingsIndex]);
+                            this.tables[this.curTableId + 2].toDothings.thingsIsFinish.splice(thingsIndex, 1, this.tables[this.curTableId + 2].toDothings.thingsIsFinish[length - 1]);
+                            this.tables[this.curTableId + 2].toDothings.thingsIsFinish.splice(length - 1, 1, this.table.toDothings.thingsNotFinish[0]);
+                            this.table.toDothings.thingsNotFinish[0] = [];
+                        } else {
+                            this.table.toDothings.thingsNotFinish.splice(0, 1, this.tables[this.curTableId + 2].toDothings.thingsIsFinish[thingsIndex]);
+                            this.tables[this.curTableId + 2].toDothings.thingsIsFinish.splice(thingsIndex, 1, this.tables[this.curTableId + 2].toDothings.thingsIsFinish[thingsIndex - 1]);
+                            this.tables[this.curTableId + 2].toDothings.thingsIsFinish.splice(thingsIndex - 1, 1, this.table.toDothings.thingsNotFinish[0]);
+                            this.table.toDothings.thingsNotFinish[0] = [];
+                        }
+                    }
+
+                },
+                pgDN: function(thingsIndex, thingsState) {
+                    if (thingsState === -1) {
+                        if (thingsIndex === this.tables[this.curTableId + 2].toDothings.thingsNotFinish.length - 1) {
+                            let length = this.tables[this.curTableId + 2].toDothings.thingsNotFinish.length;
+                            this.table.toDothings.thingsNotFinish.splice(0, 1, this.tables[this.curTableId + 2].toDothings.thingsNotFinish[thingsIndex]);
+                            this.tables[this.curTableId + 2].toDothings.thingsNotFinish.splice(thingsIndex, 1, this.tables[this.curTableId + 2].toDothings.thingsNotFinish[0]);
+                            this.tables[this.curTableId + 2].toDothings.thingsNotFinish.splice(0, 1, this.table.toDothings.thingsNotFinish[0]);
+                            this.table.toDothings.thingsNotFinish[0] = [];
+                        } else {
+                            this.table.toDothings.thingsNotFinish.splice(0, 1, this.tables[this.curTableId + 2].toDothings.thingsNotFinish[thingsIndex]);
+                            this.tables[this.curTableId + 2].toDothings.thingsNotFinish.splice(thingsIndex, 1, this.tables[this.curTableId + 2].toDothings.thingsNotFinish[thingsIndex + 1]);
+                            this.tables[this.curTableId + 2].toDothings.thingsNotFinish.splice(thingsIndex + 1, 1, this.table.toDothings.thingsNotFinish[0]);
+                            this.table.toDothings.thingsNotFinish[0] = [];
+                        }
+                    }
+                    if (thingsState === 1) {
+                        if (thingsIndex === this.tables[this.curTableId + 2].toDothings.thingsIsFinish.length - 1) {
+                            let length = this.tables[this.curTableId + 2].toDothings.thingsIsFinish.length;
+                            this.table.toDothings.thingsNotFinish.splice(0, 1, this.tables[this.curTableId + 2].toDothings.thingsIsFinish[thingsIndex]);
+                            this.tables[this.curTableId + 2].toDothings.thingsIsFinish.splice(thingsIndex, 1, this.tables[this.curTableId + 2].toDothings.thingsIsFinish[0]);
+                            this.tables[this.curTableId + 2].toDothings.thingsIsFinish.splice(0, 1, this.table.toDothings.thingsNotFinish[0]);
+                            this.table.toDothings.thingsNotFinish[0] = [];
+                        } else {
+                            this.table.toDothings.thingsNotFinish.splice(0, 1, this.tables[this.curTableId + 2].toDothings.thingsIsFinish[thingsIndex]);
+                            this.tables[this.curTableId + 2].toDothings.thingsIsFinish.splice(thingsIndex, 1, this.tables[this.curTableId + 2].toDothings.thingsIsFinish[thingsIndex + 1]);
+                            this.tables[this.curTableId + 2].toDothings.thingsIsFinish.splice(thingsIndex + 1, 1, this.table.toDothings.thingsNotFinish[0]);
+                            this.table.toDothings.thingsNotFinish[0] = [];
+                        }
+                    }
+                },
+                //添加事项输入框隐藏显示
+                changeInputState: function() {
+                    if (this.States[2].state === true) {
+                        this.States[2].state = false;
+                    } else {
+                        this.States[2].state = true;
+                    }
+                },
+                //搜索页面隐藏显示
+                changeSearchState: function() {
+                    if (this.States[3].state === true) {
+                        this.States[3].state = false;
+                    } else {
+                        this.States[3].state = true;
+                    }
+                },
+                //删除清单
+                deleteTable: function(index) {
+                    let passIndex = index + 2;
+                    this.tables.splice(passIndex, 1);
+                },
+            },
+
+            //生命周期函数created
+            created() {
+                if (localStorage.getItem('tablesBackup')) {
+                    this.tables = JSON.parse(localStorage.getItem("tablesBackup"));
+                }
+            },
+            // 生命周期mounted
+            mounted() {
+                this.getTable(-2);
+            },
+            //生命周期updated
+            updated() {
+                localStorage.setItem('tablesBackup', JSON.stringify(this.tables));
+            },
+
+            //计算属性
+            computed: {
+                //用户清单
+                Mytables: function() {
+                    var Mytables = [];
+                    this.tables[0].toDothings.thingsNotFinish = [];
+                    this.tables[0].toDothings.thingsNotFinishNum = 0;
+                    this.tables[1].toDothings.thingsNotFinish = [];
+                    this.tables[1].toDothings.thingsNotFinishNum = 0;
+                    for (let i = 0; i < this.tables.length - 2; i++) {
+                        Mytables[i] = this.tables[i + 2];
+                    }
+                    for (let x = 2; x < this.tables.length; x++) {
+                        for (let y = 0; y < this.tables[x].toDothings.thingsNotFinish.length; y++) {
+                            if (this.tables[x].toDothings.thingsNotFinish[y].FTime === curDate) {
+                                this.tables[0].toDothings.thingsNotFinish.push(this.tables[x].toDothings.thingsNotFinish[y]);
+                                this.tables[0].toDothings.thingsNotFinishNum += 1;
+                            }
+                            if (this.tables[x].toDothings.thingsNotFinish[y].FTime < curDate) {
+                                this.tables[1].toDothings.thingsNotFinish.push(this.tables[x].toDothings.thingsNotFinish[y]);
+                                this.tables[1].toDothings.thingsNotFinishNum += 1;
+                            }
+                        }
+                    }
+
+                    return Mytables;
+                },
+                //搜索结果数组
+                searchResoultIsFinish: function() {
+                    var searchResoultIsFinish = [];
+                    for (let i = 2; i < this.tables.length; i++) {
+                        for (let j = 0; j < this.tables[i].toDothings.thingsIsFinish.length; j++) {
+                            if (this.tables[i].toDothings.thingsIsFinish[j].title.search(this.searchInfo) != -1) {
+                                searchResoultIsFinish.push({
+                                    TbIndex: i,
+                                    ThIndex: j,
+                                    info: this.tables[i].toDothings.thingsIsFinish[j].title
+                                });
+                            }
+                        }
+                    }
+                    return searchResoultIsFinish;
+                },
+                searchResoultNotFinish: function() {
+                    var searchResoultNotFinish = [];
+                    for (let i = 2; i < this.tables.length; i++) {
+                        for (let j = 0; j < this.tables[i].toDothings.thingsNotFinish.length; j++) {
+                            if (this.tables[i].toDothings.thingsNotFinish[j].title.search(this.searchInfo) != -1) {
+                                searchResoultNotFinish.push({
+                                    TbIndex: i,
+                                    ThIndex: j,
+                                    info: this.tables[i].toDothings.thingsNotFinish[j].title
+                                });
+                            }
+                        }
+                    }
+                    return searchResoultNotFinish;
+                }
+            },
+        })
+    </script>
+
+</body>
+
+</html>
