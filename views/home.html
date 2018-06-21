@@ -150,7 +150,7 @@
                                                         </li>
                                                         <li>
                                                             <div class="MenuOption">
-                                                                <a href="#">编辑</a>
+                                                                <a href="#" @click="readyForEdit(thingsIndex,-1)">编辑</a>
                                                             </div>
                                                         </li>
                                                         <li>
@@ -207,7 +207,7 @@
                                                 </li>
                                                 <li>
                                                     <div class="MenuOption">
-                                                        <a href="#">编辑</a>
+                                                        <a href="#" @click="readyForEdit(thingsIndex,1)">编辑</a>
                                                     </div>
                                                 </li>
                                                 <li>
@@ -243,6 +243,12 @@
                         <input type="date" class="addTask-input" name="plan_date_time" v-model="table.toDothings.thingsNotFinish[0].FTime" style="width: 15%">
                         <input type="text " id="addTaskInput " class="addTask-input " v-model="table.toDothings.thingsNotFinish[0].title" placeholder="添加待办事项" @keyup.enter="addToDoThings()">
                     </div>
+                    <!-- 修改事项 -->
+                    <div :class="{addThingsInput:States[4].state}">
+                        <input type="date" class="addTask-input" name="plan_date_time" v-model="table.toDothings.thingsNotFinish[0].FTime" style="width: 15%">
+                        <input type="text " id="addTaskInput " class="addTask-input " v-model="table.toDothings.thingsNotFinish[0].title" @keyup.enter="editToDoThings()">
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -258,6 +264,10 @@
             //数据
             data: {
                 curTableId: '-2',
+                curThings: {
+                    id: -1,
+                    editElement: 0
+                },
                 tableNum: '2',
                 searchInfo: '',
                 curDate: curDate,
@@ -292,6 +302,9 @@
                 }, {
                     name: 'searchState', //[3]  搜索div隐藏显示
                     state: false
+                }, {
+                    name: 'editState', //[4]  编辑事项 隐藏显示
+                    state: true
                 }],
                 tables: [{
                     id: -2,
@@ -359,6 +372,34 @@
                         title: '',
                         FTime: this.curDate
                     }];
+                },
+                //修改操作初始化
+                readyForEdit: function(thingsIndex, editElement) {
+                    this.curThings.id = thingsIndex;
+                    this.curThings.editElement = editElement;
+                    this.States[4].state = false
+                    if (editElement === -1) {
+                        this.table.toDothings.thingsNotFinish[0].FTime = this.tables[this.curTableId + 2].toDothings.thingsNotFinish[this.curThings.id].FTime;
+                        this.table.toDothings.thingsNotFinish[0].title = this.tables[this.curTableId + 2].toDothings.thingsNotFinish[this.curThings.id].title;
+                    }
+                    if (editElement === 1) {
+                        alert(this.table.toDothings.thingsNotFinish[0].FTime)
+                        alert(this.tables[this.curTableId + 2].toDothings.thingsIsFinish[this.curThings.id].FTime)
+                        this.table.toDothings.thingsNotFinish[0].FTime = this.tables[this.curTableId + 2].toDothings.thingsIsFinish[this.curThings.id].FTime;
+                        this.table.toDothings.thingsNotFinish[0].title = this.tables[this.curTableId + 2].toDothings.thingsIsFinish[this.curThings.id].title;
+                    }
+                },
+                //执行修改函数
+                editToDoThings: function() {
+                    if (this.curThings.editElement === -1) {
+                        this.tables[this.curTableId + 2].toDothings.thingsNotFinish[this.curThings.id].FTime = this.table.toDothings.thingsNotFinish[0].FTime;
+                        this.tables[this.curTableId + 2].toDothings.thingsNotFinish[this.curThings.id].title = this.table.toDothings.thingsNotFinish[0].title;
+                    }
+                    if (this.curThings.editElement === 1) {
+                        this.tables[this.curTableId + 2].toDothings.thingsIsFinish[this.curThings.id].FTime = this.table.toDothings.thingsNotFinish[0].FTime;
+                        this.tables[this.curTableId + 2].toDothings.thingsIsFinish[this.curThings.id].title = this.table.toDothings.thingsNotFinish[0].title;
+                    }
+                    this.States[4].state = true;
                 },
                 //改变事件完成状态
                 changeFinishState: function(thingsIndex, thingsState) {
