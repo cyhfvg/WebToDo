@@ -126,6 +126,8 @@
                             <div class="tasks col-sm-12" :class="{tasksOther:States[1].state}">
                                 <!-- 指定清单中的未完成待办事项 -->
                                 <span class="icon-ok-circle"><span><font size="5px">未完成</font></span></span>
+                                <span class="icon-chevron-down" @click="changeTimeSortOption()" v-if="States[5].state===false"></span>
+                                <span class="icon-chevron-up" @click="changeTimeSortOption()" v-if="States[5].state===true"></span>
                                 <span class="icon-plus" @click="changeInputState()" :class="{searchDiv:States[3].state}"></span>
                                 <div :class="{searchDiv:States[3].state}">
                                     <div class="taskItem-body " v-for="(table,tableIndex) in tables" v-if="tableIndex===curTableId+2">
@@ -133,7 +135,8 @@
                                             <div class="thingsForm">
                                                 <!-- 未完成事项 -->
                                                 <div class="taskItem-title ">
-                                                    <input class="addTask-input" v-model="table.toDothings.thingsNotFinish[thingsIndex].title">
+                                                    <!-- <input class="addTask-input" v-model="table.toDothings.thingsNotFinish[thingsIndex].title"> -->
+                                                    {{table.toDothings.thingsNotFinish[thingsIndex].FTime}} {{table.toDothings.thingsNotFinish[thingsIndex].title}}
                                                 </div>
                                                 <div class="thingsFormOption btn-group">
                                                     <!-- 标记已完成 -->
@@ -190,7 +193,7 @@
                                 <div v-for="(thing,thingsIndex) in table.toDothings.thingsIsFinish">
                                     <div class="thingsForm">
                                         <div class="taskItem-title ">
-                                            <input class="addTask-input" v-model="table.toDothings.thingsIsFinish[thingsIndex].title">
+                                            {{table.toDothings.thingsIsFinish[thingsIndex].FTime}} {{table.toDothings.thingsIsFinish[thingsIndex].title}}
                                         </div>
                                         <div class="thingsFormOption btn-group">
                                             <!-- 标记未完成 -->
@@ -305,6 +308,9 @@
                 }, {
                     name: 'editState', //[4]  编辑事项 隐藏显示
                     state: true
+                }, {
+                    name: 'TimeFormat', //[5] 事项按时间排序
+                    state: true //false-->降序；true-->升序
                 }],
                 tables: [{
                     id: -2,
@@ -383,8 +389,6 @@
                         this.table.toDothings.thingsNotFinish[0].title = this.tables[this.curTableId + 2].toDothings.thingsNotFinish[this.curThings.id].title;
                     }
                     if (editElement === 1) {
-                        alert(this.table.toDothings.thingsNotFinish[0].FTime)
-                        alert(this.tables[this.curTableId + 2].toDothings.thingsIsFinish[this.curThings.id].FTime)
                         this.table.toDothings.thingsNotFinish[0].FTime = this.tables[this.curTableId + 2].toDothings.thingsIsFinish[this.curThings.id].FTime;
                         this.table.toDothings.thingsNotFinish[0].title = this.tables[this.curTableId + 2].toDothings.thingsIsFinish[this.curThings.id].title;
                     }
@@ -447,6 +451,66 @@
                         this.tables[this.curTableId + 2].toDothings.thingsIsFinishNum -= 1;
                     }
 
+                },
+                //事项时间排序
+                thingsTimeFormat: function() {
+                    if (this.States[5].state === false) { //降序
+                        for (let x = 2; x < this.tables.length; x++) {
+                            for (let i = 0; i < this.tables[x].toDothings.thingsNotFinish.length - 1; i++) {
+                                for (let j = 0; j < this.tables[x].toDothings.thingsNotFinish.length - i - 1; j++) {
+                                    // alert('x' + x + 'i' + i + 'j' + j)
+                                    // alert(this.table.toDothings.thingsNotFinish[0].title)
+                                    if (this.tables[x].toDothings.thingsNotFinish[j].FTime > this.tables[x].toDothings.thingsNotFinish[j + 1].FTime) {
+                                        this.table.toDothings.thingsNotFinish[0] = this.tables[x].toDothings.thingsNotFinish[j];
+                                        this.tables[x].toDothings.thingsNotFinish.splice(j, 1, this.tables[x].toDothings.thingsNotFinish[j + 1]);
+                                        this.tables[x].toDothings.thingsNotFinish.splice(j + 1, 1, this.table.toDothings.thingsNotFinish[0]);
+                                        this.table.toDothings.thingsNotFinish[0] = [];
+                                    }
+
+                                }
+                                for (let m = 0; m < this.tables[x].toDothings.thingsIsFinish.length - i - 1; m++) {
+                                    if (this.tables[x].toDothings.thingsIsFinish[m].FTime > this.tables[x].toDothings.thingsIsFinish[m + 1].FTime) {
+                                        this.table.toDothings.thingsNotFinish[0] = this.tables[x].toDothings.thingsIsFinish[m];
+                                        this.tables[x].toDothings.thingsIsFinish.splice(m, 1, this.tables[x].toDothings.thingsIsFinish[m + 1]);
+                                        this.tables[x].toDothings.thingsIsFinish.splice(m + 1, 1, this.table.toDothings.thingsNotFinish[0]);
+                                        this.table.toDothings.thingsNotFinish[0] = [];
+                                    }
+                                }
+                            }
+                        }
+                    } else { //升序
+                        for (let x = 2; x < this.tables.length; x++) {
+                            for (let i = 0; i < this.tables[x].toDothings.thingsNotFinish.length - 1; i++) {
+                                for (let j = 0; j < this.tables[x].toDothings.thingsNotFinish.length - i - 1; j++) {
+                                    // alert('x' + x + 'i' + i + 'j' + j)
+                                    // alert(this.table.toDothings.thingsNotFinish[0].title)
+                                    if (this.tables[x].toDothings.thingsNotFinish[j].FTime < this.tables[x].toDothings.thingsNotFinish[j + 1].FTime) {
+                                        this.table.toDothings.thingsNotFinish[0] = this.tables[x].toDothings.thingsNotFinish[j];
+                                        this.tables[x].toDothings.thingsNotFinish.splice(j, 1, this.tables[x].toDothings.thingsNotFinish[j + 1]);
+                                        this.tables[x].toDothings.thingsNotFinish.splice(j + 1, 1, this.table.toDothings.thingsNotFinish[0]);
+                                        this.table.toDothings.thingsNotFinish[0] = [];
+                                    }
+
+                                }
+                                for (let m = 0; m < this.tables[x].toDothings.thingsIsFinish.length - i - 1; m++) {
+                                    if (this.tables[x].toDothings.thingsIsFinish[m].FTime < this.tables[x].toDothings.thingsIsFinish[m + 1].FTime) {
+                                        this.table.toDothings.thingsNotFinish[0] = this.tables[x].toDothings.thingsIsFinish[m];
+                                        this.tables[x].toDothings.thingsIsFinish.splice(m, 1, this.tables[x].toDothings.thingsIsFinish[m + 1]);
+                                        this.tables[x].toDothings.thingsIsFinish.splice(m + 1, 1, this.table.toDothings.thingsNotFinish[0]);
+                                        this.table.toDothings.thingsNotFinish[0] = [];
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                //改变时间排序option
+                changeTimeSortOption: function() {
+                    if (this.States[5].state === false) {
+                        this.States[5].state = true;
+                    } else {
+                        this.States[5].state = false;
+                    }
                 },
                 //事项手动排序
                 pgUP: function(thingsIndex, thingsState) {
@@ -552,6 +616,7 @@
             computed: {
                 //用户清单
                 Mytables: function() {
+                    this.thingsTimeFormat();
                     var Mytables = [];
                     this.tables[0].toDothings.thingsNotFinish = [];
                     this.tables[0].toDothings.thingsNotFinishNum = 0;

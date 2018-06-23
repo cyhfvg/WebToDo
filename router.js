@@ -1,6 +1,7 @@
 var LocalStorage = require('node-localstorage').LocalStorage;
 var sessionStorage = require('sessionstorage');
 var bodyParser = require('body-parser');
+var config = require('./config');
 var express = require('express');
 var router = express.Router();
 
@@ -41,7 +42,7 @@ router.get('/home', function(req, res) {
             name: JSON.parse(sessionStorage.getItem('userState')).name
         });
     } else {
-        res.redirect('http://127.0.0.1:8081/login');
+        res.redirect('/login');
     }
 
 })
@@ -64,7 +65,7 @@ router.post('/login_post', urlencodedParser, function(req, res) {
             }
         }
         if (id === -1) { //无此用户
-            res.redirect('http://127.0.0.1:8081/login');
+            res.redirect('/login');
             console.log('have no this user:' + name);
         } else if (passwd === dirAcc[id].passwd) { //密码正确 存储session
             const UserInfoNow = {
@@ -72,14 +73,14 @@ router.post('/login_post', urlencodedParser, function(req, res) {
                 passwd: passwd
             }
             sessionStorage.setItem('userState', JSON.stringify(UserInfoNow));
-            res.redirect('http://127.0.0.1:8081/home');
+            res.redirect('/home');
             console.log(name + ' login success');
         } else {
-            res.redirect('http://127.0.0.1:8081/login');
+            res.redirect('/login');
             console.log('password not right');
         }
     } else { //无用户库 注册
-        res.redirect('http://127.0.0.1:8081/register');
+        res.redirect('/register');
         console.log('have no user,register');
     }
     res.end();
@@ -101,7 +102,7 @@ router.post('/register_post', urlencodedParser, function(req, res) {
                 }
             }
             if (existSate) { //用户存在
-                res.redirect('http://127.0.0.1:8081/register');
+                res.redirect('/register');
                 console.log('user already exist');
             } else { //用户不存在 创建
                 let user = {
@@ -110,7 +111,7 @@ router.post('/register_post', urlencodedParser, function(req, res) {
                 };
                 dirAcc.push(user);
                 localStorage.setItem('users', JSON.stringify(dirAcc));
-                res.redirect('http://127.0.0.1:8081/login');
+                res.redirect('/login');
                 console.log(name + ' register success');
             }
         } else { //无用户文件
@@ -119,15 +120,12 @@ router.post('/register_post', urlencodedParser, function(req, res) {
                 passwd: passwd1
             }]
             localStorage.setItem('users', JSON.stringify(user));
-            res.redirect('http://127.0.0.1:8081/login');
+            res.redirect('/login');
             console.log(name + ' register success');
         }
     } else {
-        res.redirect('http://127.0.0.1:8081/register');
+        res.redirect('/register');
         console.log('passwd not same');
     }
-
-
-
 })
 module.exports = router;

@@ -1,6 +1,7 @@
 var bodyParser = require('body-parser');
 var express = require('express');
 var router = require('./router');
+var config = require('./config');
 var ejs = require('ejs');
 var path = require('path');
 var app = express();
@@ -18,8 +19,8 @@ app.engine('.html', ejs.__express);
 app.set('view engine', 'html');
 
 //服务器监听
-var server = app.listen(8081, function() {
+var server = app.listen(config.port, function() {
 
-    console.log("应用实例，访问地址为 8081");
+    console.log("应用实例，访问地址为" + config.port);
 
 })
