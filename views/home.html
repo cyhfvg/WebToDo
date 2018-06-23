@@ -147,17 +147,7 @@
                                                     <ul class="dropdown-menu" role="menu" style="width: 25px;">
                                                         <li>
                                                             <div class="MenuOption">
-                                                                <a class="icon-sort-up" href="#" @click="pgUP(thingsIndex,-1)"></a>
-                                                            </div>
-                                                        </li>
-                                                        <li>
-                                                            <div class="MenuOption">
                                                                 <a href="#" @click="readyForEdit(thingsIndex,-1)">编辑</a>
-                                                            </div>
-                                                        </li>
-                                                        <li>
-                                                            <div class="MenuOption">
-                                                                <a class="icon-sort-down" href="#" @click="pgDN(thingsIndex,-1)"></a>
                                                             </div>
                                                         </li>
                                                         <li>
@@ -204,17 +194,7 @@
                                             <ul class="dropdown-menu" role="menu">
                                                 <li>
                                                     <div class="MenuOption">
-                                                        <a class="icon-sort-up" href="#" @click="pgUP(thingsIndex,1)"></a>
-                                                    </div>
-                                                </li>
-                                                <li>
-                                                    <div class="MenuOption">
                                                         <a href="#" @click="readyForEdit(thingsIndex,1)">编辑</a>
-                                                    </div>
-                                                </li>
-                                                <li>
-                                                    <div class="MenuOption">
-                                                        <a class="icon-sort-down" href="#" @click="pgDN(thingsIndex,1)"></a>
                                                     </div>
                                                 </li>
                                                 <li>
@@ -382,7 +362,8 @@
                 readyForEdit: function(thingsIndex, editElement) {
                     this.curThings.id = thingsIndex;
                     this.curThings.editElement = editElement;
-                    this.States[4].state = false
+                    this.States[4].state = false;
+                    this.States[2].state = true;
                     if (editElement === -1) {
                         this.table.toDothings.thingsNotFinish[0].FTime = this.tables[this.curTableId + 2].toDothings.thingsNotFinish[this.curThings.id].FTime;
                         this.table.toDothings.thingsNotFinish[0].title = this.tables[this.curTableId + 2].toDothings.thingsNotFinish[this.curThings.id].title;
@@ -397,10 +378,18 @@
                     if (this.curThings.editElement === -1) {
                         this.tables[this.curTableId + 2].toDothings.thingsNotFinish[this.curThings.id].FTime = this.table.toDothings.thingsNotFinish[0].FTime;
                         this.tables[this.curTableId + 2].toDothings.thingsNotFinish[this.curThings.id].title = this.table.toDothings.thingsNotFinish[0].title;
+                        this.table.toDothings.thingsNotFinish = [{
+                            title: '',
+                            FTime: this.curDate
+                        }];
                     }
                     if (this.curThings.editElement === 1) {
                         this.tables[this.curTableId + 2].toDothings.thingsIsFinish[this.curThings.id].FTime = this.table.toDothings.thingsNotFinish[0].FTime;
                         this.tables[this.curTableId + 2].toDothings.thingsIsFinish[this.curThings.id].title = this.table.toDothings.thingsNotFinish[0].title;
+                        this.table.toDothings.thingsNotFinish = [{
+                            title: '',
+                            FTime: this.curDate
+                        }];
                     }
                     this.States[4].state = true;
                 },
@@ -449,7 +438,6 @@
                         this.tables[this.curTableId + 2].toDothings.thingsIsFinish.splice(thingsIndex, 1);
                         this.tables[this.curTableId + 2].toDothings.thingsIsFinishNum -= 1;
                     }
-
                 },
                 //事项时间排序
                 thingsTimeFormat: function() {
@@ -511,68 +499,6 @@
                         this.States[5].state = false;
                     }
                 },
-                //事项手动排序
-                pgUP: function(thingsIndex, thingsState) {
-                    if (thingsState === -1) {
-                        if (thingsIndex === 0) {
-                            let length = this.tables[this.curTableId + 2].toDothings.thingsNotFinish.length;
-                            this.table.toDothings.thingsNotFinish.splice(0, 1, this.tables[this.curTableId + 2].toDothings.thingsNotFinish[thingsIndex]);
-                            this.tables[this.curTableId + 2].toDothings.thingsNotFinish.splice(thingsIndex, 1, this.tables[this.curTableId + 2].toDothings.thingsNotFinish[length - 1]);
-                            this.tables[this.curTableId + 2].toDothings.thingsNotFinish.splice(length - 1, 1, this.table.toDothings.thingsNotFinish[0]);
-                            this.table.toDothings.thingsNotFinish[0] = [];
-                        } else {
-                            this.table.toDothings.thingsNotFinish.splice(0, 1, this.tables[this.curTableId + 2].toDothings.thingsNotFinish[thingsIndex]);
-                            this.tables[this.curTableId + 2].toDothings.thingsNotFinish.splice(thingsIndex, 1, this.tables[this.curTableId + 2].toDothings.thingsNotFinish[thingsIndex - 1]);
-                            this.tables[this.curTableId + 2].toDothings.thingsNotFinish.splice(thingsIndex - 1, 1, this.table.toDothings.thingsNotFinish[0]);
-                            this.table.toDothings.thingsNotFinish[0] = [];
-                        }
-                    }
-                    if (thingsState === 1) {
-                        if (thingsIndex === 0) {
-                            let length = this.tables[this.curTableId + 2].toDothings.thingsIsFinish.length;
-                            this.table.toDothings.thingsNotFinish.splice(0, 1, this.tables[this.curTableId + 2].toDothings.thingsIsFinish[thingsIndex]);
-                            this.tables[this.curTableId + 2].toDothings.thingsIsFinish.splice(thingsIndex, 1, this.tables[this.curTableId + 2].toDothings.thingsIsFinish[length - 1]);
-                            this.tables[this.curTableId + 2].toDothings.thingsIsFinish.splice(length - 1, 1, this.table.toDothings.thingsNotFinish[0]);
-                            this.table.toDothings.thingsNotFinish[0] = [];
-                        } else {
-                            this.table.toDothings.thingsNotFinish.splice(0, 1, this.tables[this.curTableId + 2].toDothings.thingsIsFinish[thingsIndex]);
-                            this.tables[this.curTableId + 2].toDothings.thingsIsFinish.splice(thingsIndex, 1, this.tables[this.curTableId + 2].toDothings.thingsIsFinish[thingsIndex - 1]);
-                            this.tables[this.curTableId + 2].toDothings.thingsIsFinish.splice(thingsIndex - 1, 1, this.table.toDothings.thingsNotFinish[0]);
-                            this.table.toDothings.thingsNotFinish[0] = [];
-                        }
-                    }
-
-                },
-                pgDN: function(thingsIndex, thingsState) {
-                    if (thingsState === -1) {
-                        if (thingsIndex === this.tables[this.curTableId + 2].toDothings.thingsNotFinish.length - 1) {
-                            let length = this.tables[this.curTableId + 2].toDothings.thingsNotFinish.length;
-                            this.table.toDothings.thingsNotFinish.splice(0, 1, this.tables[this.curTableId + 2].toDothings.thingsNotFinish[thingsIndex]);
-                            this.tables[this.curTableId + 2].toDothings.thingsNotFinish.splice(thingsIndex, 1, this.tables[this.curTableId + 2].toDothings.thingsNotFinish[0]);
-                            this.tables[this.curTableId + 2].toDothings.thingsNotFinish.splice(0, 1, this.table.toDothings.thingsNotFinish[0]);
-                            this.table.toDothings.thingsNotFinish[0] = [];
-                        } else {
-                            this.table.toDothings.thingsNotFinish.splice(0, 1, this.tables[this.curTableId + 2].toDothings.thingsNotFinish[thingsIndex]);
-                            this.tables[this.curTableId + 2].toDothings.thingsNotFinish.splice(thingsIndex, 1, this.tables[this.curTableId + 2].toDothings.thingsNotFinish[thingsIndex + 1]);
-                            this.tables[this.curTableId + 2].toDothings.thingsNotFinish.splice(thingsIndex + 1, 1, this.table.toDothings.thingsNotFinish[0]);
-                            this.table.toDothings.thingsNotFinish[0] = [];
-                        }
-                    }
-                    if (thingsState === 1) {
-                        if (thingsIndex === this.tables[this.curTableId + 2].toDothings.thingsIsFinish.length - 1) {
-                            let length = this.tables[this.curTableId + 2].toDothings.thingsIsFinish.length;
-                            this.table.toDothings.thingsNotFinish.splice(0, 1, this.tables[this.curTableId + 2].toDothings.thingsIsFinish[thingsIndex]);
-                            this.tables[this.curTableId + 2].toDothings.thingsIsFinish.splice(thingsIndex, 1, this.tables[this.curTableId + 2].toDothings.thingsIsFinish[0]);
-                            this.tables[this.curTableId + 2].toDothings.thingsIsFinish.splice(0, 1, this.table.toDothings.thingsNotFinish[0]);
-                            this.table.toDothings.thingsNotFinish[0] = [];
-                        } else {
-                            this.table.toDothings.thingsNotFinish.splice(0, 1, this.tables[this.curTableId + 2].toDothings.thingsIsFinish[thingsIndex]);
-                            this.tables[this.curTableId + 2].toDothings.thingsIsFinish.splice(thingsIndex, 1, this.tables[this.curTableId + 2].toDothings.thingsIsFinish[thingsIndex + 1]);
-                            this.tables[this.curTableId + 2].toDothings.thingsIsFinish.splice(thingsIndex + 1, 1, this.table.toDothings.thingsNotFinish[0]);
-                            this.table.toDothings.thingsNotFinish[0] = [];
-                        }
-                    }
-                },
                 //添加事项输入框隐藏显示
                 changeInputState: function() {
                     if (this.States[2].state === true) {
@@ -580,6 +506,13 @@
                     } else {
                         this.States[2].state = true;
                     }
+                    if (this.States[4].state === false) {
+                        this.States[4].state = true;
+                    }
+                    this.table.toDothings.thingsNotFinish = [{
+                        title: '',
+                        FTime: this.curDate
+                    }];
                 },
                 //搜索页面隐藏显示
                 changeSearchState: function() {
