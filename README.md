@@ -26,6 +26,7 @@ node app.js
 
         1.注册页面
 ![](https://github.com/cyhfvg/WebToDo/tree/master/assests/images/register.png) </br> 
+![](http://www.baidu.com/img/bdlogo.gif) </br> 
 
         2.新建清单
         3.给指定清单添加事项
