@@ -34,14 +34,14 @@ node app.js
         4.编辑事项
 ![image](https://github.com/cyhfvg/WebToDo/blob/master/assests/images/editThings.png) </br>
 
-        4.指定清单修改名称
+        5.指定清单修改名称
 ![image](https://github.com/cyhfvg/WebToDo/blob/master/assests/images/editTable.png) </br>
 
-        5.更改事项完成状态
-        6.隐藏/显示已完成事项
-        7.各清单中事项排序方式改变（按时间升序/按时间降序）
-        8.更改主题
-        9.事项搜索
+        6.更改事项完成状态
+        7.隐藏/显示已完成事项
+        8.各清单中事项排序方式改变（按时间升序/按时间降序）
+        9.更改主题
+        10.事项搜索
 ![image](https://github.com/cyhfvg/WebToDo/blob/master/assests/images/search.png) </br>
 
-        10.注销
+        11.注销
