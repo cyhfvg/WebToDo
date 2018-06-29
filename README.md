@@ -25,7 +25,8 @@ node app.js
 ### 2、ToDoList使用方法：
 
         1.注册页面
-![](https://github.com/cyhfvg/WebToDo/tree/master/assests/images/register.png)</br> 
+![](https://github.com/cyhfvg/WebToDo/tree/master/assests/images/register.png) </br> 
+
         2.新建清单
         3.给指定清单添加事项
         4.指定清单修改名称
