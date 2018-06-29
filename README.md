@@ -5,7 +5,6 @@ TODOLIST
 
         TodoList可以实现以下功能：
 
-        =========
         1.用户登陆才能使用待办清单系统，具备用户注销功能
         2.添加待办事项
         3.标记任务完成
@@ -26,6 +25,7 @@ node app.js
 ### 2、ToDoList使用方法：
 
         1.注册页面
+![](https://github.com/cyhfvg/WebToDo/tree/master/assests/images/register.png)</br> 
         2.新建清单
         3.给指定清单添加事项
         4.指定清单修改名称
