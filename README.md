@@ -31,6 +31,9 @@ node app.js
         3.给指定清单添加事项
 ![image](https://github.com/cyhfvg/WebToDo/blob/master/assests/images/addThings.png) </br>
 
+        4.编辑事项
+![image](https://github.com/cyhfvg/WebToDo/blob/master/assests/images/editThings.png) </br>
+
         4.指定清单修改名称
 ![image](https://github.com/cyhfvg/WebToDo/blob/master/assests/images/editTable.png) </br>
 
