@@ -9,6 +9,8 @@
     <link rel="stylesheet" type="text/css" media="screen" href="css/bootstrap.css" />
     <link rel="stylesheet" type="text/css" href="css/style.css">
     <link href="css/Font-Awesome-3.2.1/css/font-awesome.css" rel="stylesheet">
+    <!-- <script src="https://unpkg.com/axios/dist/axios.min.js"></script> -->
+    <script src="js/axios.js"></script>
     <script src="js/jquery-3.3.1.min.js"></script>
     <script src="js/popper.js"></script>
     <script src="js/dateformat.js"></script>
@@ -49,6 +51,7 @@
                                 </div>
                             </li>
                         </ul>
+                        <span class="icon-upload-alt" @click="upload()"></span>
                         <!-- 搜索按钮 -->
                         <span class="icon-search" @click="changeSearchState()"></span>
                     </div>
@@ -240,7 +243,11 @@
 
     <script src="js/vue.js "></script>
     <script>
+        var userName = "<%= name %>";
+        var userData = <%- userData %>;
+        var userId = "<%-userId%>";
         var curDate = DateFormat.format(new Date(), 'yyyy-MM-dd');
+
         var vm = new Vue({
             el: '#app',
             //数据
@@ -527,12 +534,44 @@
                     let passIndex = index + 2;
                     this.tables.splice(passIndex, 1);
                 },
+                upload: function() {
+                    axios({
+                        method: 'post',
+                        url: '/userData_post',
+                        data: {
+                            user: 'test',
+                            uploadData: this.tables,
+                            userId: userId
+                        }
+                    });
+                    alert('1');
+                }
             },
+            // watch: {
+            //     'tables': {
+            //         handler: function(newValue, oldValue) {
+            //             axios({
+            //                 method: 'post',
+            //                 url: '/userData_post',
+            //                 data: {
+            //                     user: 'test',
+            //                     uploadData: this.tables,
+            //                     userId: userId
+            //                 }
+            //             });
+            //         },
+            //         deep: true,
+            //     }
+            // },
 
             //生命周期函数created
             created() {
-                if (localStorage.getItem('tablesBackup')) {
-                    this.tables = JSON.parse(localStorage.getItem("tablesBackup"));
+                //localstorage存储
+                // if (localStorage.getItem('tablesBackup')) {
+                //     this.tables = JSON.parse(localStorage.getItem("tablesBackup"));
+                // }
+                if (userData != '') {
+                    this.tables = userData;
                 }
             },
             // 生命周期mounted
@@ -540,9 +579,18 @@
                 this.getTable(-2);
             },
             //生命周期updated
-            updated() {
-                localStorage.setItem('tablesBackup', JSON.stringify(this.tables));
-            },
+            // updated() {
+            //localstorage存储
+            // localStorage.setItem('tablesBackup', JSON.stringify(this.tables));
+            // axios({
+            //     method: 'post',
+            //     url: '/userData_post',
+            //     data: {
+            //         user: 'test',
+            //         uploadData: this.tables
+            //     }
+            // });
+            // },
 
             //计算属性
             computed: {

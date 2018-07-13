@@ -10,6 +10,11 @@ localStorage = new LocalStorage('./scratch');
 var register_msg = '';
 var login_msg = '';
 
+router.use(bodyParser.json({ limit: '5mb' }));
+router.use(bodyParser.urlencoded({
+    extended: true
+}));
+
 // 创建 application/x-www-form-urlencoded 编码解析
 var urlencodedParser = bodyParser.urlencoded({ extended: false });
 
@@ -60,7 +65,7 @@ router.get('/login', function(req, res) {
             msg: login_msg
         });
     } else {
-        login_msg = 'welcome login'
+        login_msg = 'welcome login';
         res.render("login", {
             msg: login_msg
         });
@@ -70,8 +75,12 @@ router.get('/login', function(req, res) {
 
 //注销
 router.get('/logout', function(req, res) {
+    console.log(JSON.parse(sessionStorage.getItem('userState')).name + 'logout');
     sessionStorage.removeItem('userState');
-    res.sendFile(__dirname + "/views/" + "login.html");
+    login_msg = 'logout,welcome login';
+    res.render("login", {
+        msg: login_msg
+    });
 })
 
 //index首页
@@ -80,7 +89,9 @@ router.get('/home', function(req, res) {
     if (UserInfoState) {
         res.sendFile(__dirname + "/views/" + "home.html");
         res.render('home', {
-            name: JSON.parse(sessionStorage.getItem('userState')).name
+            name: JSON.parse(sessionStorage.getItem('userState')).name,
+            userData: JSON.stringify(JSON.parse(sessionStorage.getItem('userState')).userData),
+            userId: JSON.parse(sessionStorage.getItem('userState')).userId
         });
     } else {
         res.redirect('/login');
@@ -109,7 +120,9 @@ router.post('/login_post', urlencodedParser, function(req, res) {
         } else if (passwd === dirAcc[id].passwd) { //密码正确 存储session
             const UserInfoNow = {
                 name: name,
-                passwd: passwd
+                passwd: passwd,
+                userId: id,
+                userData: dirAcc[id].userData
             }
             sessionStorage.setItem('userState', JSON.stringify(UserInfoNow));
             res.redirect('/home');
@@ -149,7 +162,8 @@ router.post('/register_post', urlencodedParser, function(req, res) {
             } else { //用户不存在 创建
                 let user = {
                     name: name,
-                    passwd: passwd1
+                    passwd: passwd1,
+                    userData: ''
                 };
                 dirAcc.push(user);
                 localStorage.setItem('users', JSON.stringify(dirAcc));
@@ -160,7 +174,8 @@ router.post('/register_post', urlencodedParser, function(req, res) {
         } else { //无用户文件
             let user = [{
                 name: name,
-                passwd: passwd1
+                passwd: passwd1,
+                userData: ''
             }]
             localStorage.setItem('users', JSON.stringify(user));
             login_msg = 'register success';
@@ -172,5 +187,23 @@ router.post('/register_post', urlencodedParser, function(req, res) {
         res.redirect('/register');
         console.log('passwd not same');
     }
+})
+
+//页面传输数据操纵
+router.post('/userData_post', function(req, res) {
+    let tableBackup = req.body.uploadData;
+    let user = req.body.user;
+    let id = req.body.userId;
+    let existSate = -1;
+    let pick = JSON.parse(localStorage.getItem('users'));
+    // for (let i = 0; i < pick.length; i++) {
+    //     if (pick[i].name === user) {
+    //         existSate = i;
+    //     }
+    // }
+    // pick[existSate].userData = tableBackup;
+    pick[id].userData = tableBackup;
+    localStorage.setItem('users', JSON.stringify(pick));
+    console.log('    ' + user + '\'s data saved...')
 })
 module.exports = router;
