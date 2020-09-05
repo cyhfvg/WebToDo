@@ -1,7 +1,6 @@
-TODOLIST
-==========
+# TODOLIST
 
-## ToDoList是一个个人待办事项管理项目.
+## ToDoList 是一个个人待办事项管理项目.
 
         TodoList可以实现以下功能：
 
@@ -16,32 +15,38 @@ TODOLIST
         9.排序功能
 
 ### 1、项目安装
-项目入口文件为app.js</br>
+
+项目入口文件为 app.js</br>
 
 ```js
 node app.js
 ```
 
-### 2、ToDoList使用方法：
+### 2、ToDoList 使用方法：
 
         1.注册页面
-![image](https://github.com/cyhfvg/WebToDo/blob/master/assests/images/register.png) </br>
+
+![image](./assests/images/register.png) </br>
 
         2.新建清单
         3.给指定清单添加事项
-![image](https://github.com/cyhfvg/WebToDo/blob/master/assests/images/addThings.png) </br>
+
+![image](./assests/images/addThings.png) </br>
 
         4.编辑事项
-![image](https://github.com/cyhfvg/WebToDo/blob/master/assests/images/editThings.png) </br>
+
+![image](./assests/images/editThings.png) </br>
 
         5.指定清单修改名称
-![image](https://github.com/cyhfvg/WebToDo/blob/master/assests/images/editTable.png) </br>
+
+![image](./assests/images/editTable.png) </br>
 
         6.更改事项完成状态
         7.隐藏/显示已完成事项
         8.各清单中事项排序方式改变（按时间升序/按时间降序）
         9.更改主题
         10.事项搜索
-![image](https://github.com/cyhfvg/WebToDo/blob/master/assests/images/search.png) </br>
+
+![image](./assests/images/search.png) </br>
 
         11.注销
